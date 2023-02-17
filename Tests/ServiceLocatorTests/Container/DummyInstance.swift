@@ -1,1 +1,1 @@
-class DummyInstance {}
+final class DummyInstance {}

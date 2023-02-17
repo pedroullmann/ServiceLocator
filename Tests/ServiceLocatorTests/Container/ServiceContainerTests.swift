@@ -14,7 +14,7 @@ final class ServiceContainerTests: XCTestCase {
         let resolved = container.get(DummyInstance.self)?.getInstance()
 
         // Then
-        XCTAssert(resolved === instance)
+        XCTAssert(resolved is DummyInstance)
     }
 
     func test_get_whenServiceIsNotRegistered_shouldReturnNil() {

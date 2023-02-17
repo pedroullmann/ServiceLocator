@@ -1,18 +1,18 @@
 import Foundation
 
-public final class ServiceRegistration<T> {
+public final class ServiceRegistration {
 
     // MARK: - Properties
-    private let factory: () -> T
-    private var instance: T?
+    private let factory: () -> Any
+    private var instance: Any?
 
     // MARK: - Initialization
-    public init(factory: @escaping () -> T) {
+    public init(factory: @escaping () -> Any) {
         self.factory = factory
     }
 
     // MARK: - Public methods
-    public func getInstance() -> T {
+    public func getInstance() -> Any {
         if let instance = instance {
             return instance
         }

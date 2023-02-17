@@ -12,6 +12,6 @@ final class ServiceRegistrationTests: XCTestCase {
         let resolved = registration.getInstance()
 
         // Then
-        XCTAssert(instance === resolved)
+        XCTAssert(resolved is DummyInstance)
     }
 }

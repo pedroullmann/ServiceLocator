@@ -14,7 +14,7 @@ public final class ServiceContainer {
     // MARK: - Public methods
     public func register<T>(
         _ type: T.Type,
-        registration: ServiceRegistration<T>
+        registration: ServiceRegistration
     ) {
         let key = String(describing: type) as NSString
         guard services.object(forKey: key) == nil else {
@@ -23,9 +23,9 @@ public final class ServiceContainer {
         services.setObject(registration, forKey: key)
     }
 
-    public func get<T>(_ type: T.Type) -> ServiceRegistration<T>? {
+    public func get<T>(_ type: T.Type) -> ServiceRegistration? {
         let key = String(describing: type) as NSString
-        guard let registration = services.object(forKey: key) as? ServiceRegistration<T> else {
+        guard let registration = services.object(forKey: key) as? ServiceRegistration else {
             return nil
         }
         return registration

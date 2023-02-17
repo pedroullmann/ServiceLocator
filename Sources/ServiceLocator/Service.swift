@@ -4,7 +4,7 @@ import Foundation
 public struct Service<T> {
 
     // MARK: - Properties
-    private let registration: ServiceRegistration<T>
+    private let registration: ServiceRegistration
 
     // MARK: - Initialization
     public init(resolvedValue: T? = nil) {
@@ -21,7 +21,10 @@ public struct Service<T> {
 
     // MARK: - Public methods
     public var wrappedValue: T {
-        registration.getInstance()
+        guard let instance = registration.getInstance() as? T else {
+            fatalError("Service '\(T.self)' not registered")
+        }
+        return instance
     }
 
     public static func resolved(_ instance: T) -> Self {
