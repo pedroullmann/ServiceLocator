@@ -4,7 +4,7 @@
 
 Add the following to the `dependencies` array in your "Package.swift" file:
 
-     .package(url: "https://github.com/pedroullmann/ServiceLocator.git", from: Version("1.0.2"))
+     .package(url: "https://github.com/pedroullmann/ServiceLocator.git", from: Version("2.0.0"))
 
 ## Usage
 
@@ -16,9 +16,7 @@ let container = ServiceContainer.shared
 // Register lazy dependency
 container.register(
     APIServiceProtocol.self, /// Interface
-    registration: ServiceRegistration(
-        factory: { APIService() } /// Concrete
-    )
+    factory: { APIService() } /// Concrete
 )
 ```
 

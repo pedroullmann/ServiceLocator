@@ -1,11 +1,14 @@
 import Foundation
 
+public typealias ServiceFactory = () -> Any
+
 public final class ServiceContainer {
 
     // MARK: - Shared
     public static let shared = ServiceContainer()
 
     // MARK: - Properties
+    private var factories: [NSString: ServiceFactory] = [:]
     private var services = NSMapTable<NSString, AnyObject>.strongToWeakObjects()
 
     // MARK: - Initialization
@@ -14,20 +17,36 @@ public final class ServiceContainer {
     // MARK: - Public methods
     public func register<T>(
         _ type: T.Type,
-        registration: ServiceRegistration
+        factory: @escaping ServiceFactory
     ) {
         let key = String(describing: type) as NSString
-        guard services.object(forKey: key) == nil else {
+        guard factories[key] == nil else {
             fatalError("Service '\(T.self)' was registered twice")
         }
-        services.setObject(registration, forKey: key)
+        factories[key] = factory
     }
 
-    public func get<T>(_ type: T.Type) -> ServiceRegistration? {
+    public func resolve<T>(_ type: T.Type) -> T? {
         let key = String(describing: type) as NSString
-        guard let registration = services.object(forKey: key) as? ServiceRegistration else {
-            return nil
+        guard
+            let object = services.object(forKey: key),
+            let service = object as? ServiceRegistration,
+            let instance = service.instance as? T
+        else {
+            if let instance = factories[key]?() as? T {
+                let service = ServiceRegistration(instance: instance)
+                services.setObject(service, forKey: key)
+                return instance
+            } else {
+                return nil
+            }
         }
-        return registration
+        return instance
+    }
+
+    // MARK: - Internal methods
+    internal func reset() {
+        factories = [:]
+        services.removeAllObjects()
     }
 }

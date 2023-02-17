@@ -3,6 +3,10 @@ import CwlPreconditionTesting
 @testable import ServiceLocator
 
 final class ServicePropertyWrapperTests: XCTestCase {
+    override func tearDown() {
+        ServiceContainer.shared.reset()
+    }
+
     func test_initialization_whenServiceIsNotRegistered_shouldReturnBadInstruction() {
         // When
         let fatalError = catchBadInstruction {
@@ -28,8 +32,10 @@ final class ServicePropertyWrapperTests: XCTestCase {
     func test_initialization_whenServiceIsRegistered_shouldReturnInstance() {
         // Given
         let instance = DummyInstance()
-        let registration = ServiceRegistration(factory: { instance })
-        ServiceContainer.shared.register(DummyInstance.self, registration: registration)
+        ServiceContainer.shared.register(
+            DummyInstance.self,
+            factory: { instance }
+        )
         let service = Service<DummyInstance>()
 
         // When

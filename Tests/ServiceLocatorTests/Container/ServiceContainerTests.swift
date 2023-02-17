@@ -3,44 +3,60 @@ import CwlPreconditionTesting
 @testable import ServiceLocator
 
 final class ServiceContainerTests: XCTestCase {
-    func test_get_whenServiceIsRegistered_shouldReturnInstance() {
+    override func tearDown() {
+        ServiceContainer.shared.reset()
+    }
+
+    func test_register_shouldStoreFactory() {
         // Given
         let container = ServiceContainer.shared
         let instance = DummyInstance()
-        let registration = ServiceRegistration(factory: { instance })
+        let factory: () -> DummyInstance = { instance }
+        let key = String(describing: DummyInstance.self) as NSString
 
         // When
-        container.register(DummyInstance.self, registration: registration)
-        let resolved = container.get(DummyInstance.self)?.getInstance()
+        container.register(
+            DummyInstance.self,
+            factory: factory
+        )
 
         // Then
-        XCTAssert(resolved is DummyInstance)
-    }
-
-    func test_get_whenServiceIsNotRegistered_shouldReturnNil() {
-        // Given
-        let container = ServiceContainer.shared
-
-        // When
-        let resolved = container.get(DummyInstance.self)?.getInstance()
-
-        // Then
-        XCTAssertNil(resolved)
+        let factories = Mirror(reflecting: container)
+            .firstChild(of: [NSString: ServiceFactory].self)
+        let storedFactory = factories?[key]
+        let storedInstance = storedFactory?()
+        XCTAssert(storedInstance is DummyInstance)
     }
 
     func test_register_whenServiceIsRegisteredTwice_shouldReturnBadInstruction() {
         // Given
         let container = ServiceContainer.shared
-        let instance = DummyInstance()
-        let registration = ServiceRegistration(factory: { instance })
-        container.register(DummyInstance.self, registration: registration)
+        let factory: () -> DummyInstance = { DummyInstance() }
+        container.register(DummyInstance.self, factory: factory)
 
         // When
         let fatalError = catchBadInstruction {
-            container.register(DummyInstance.self, registration: registration)
+            container.register(
+                DummyInstance.self,
+                factory: factory
+            )
         }
 
-        // Then
         XCTAssertNotNil(fatalError)
+    }
+
+    func test_resolve_whenServiceIsNotInMemory_andThereIsFactory_shouldInitializeAndKeepInMemory() {
+        // Given
+        let container = ServiceContainer.shared
+        let instance = DummyInstance()
+        let factory: () -> DummyInstance = { instance }
+        container.register(DummyInstance.self, factory: factory)
+
+        // When
+        let firstInstance = container.resolve(DummyInstance.self)
+        let secondInstance = container.resolve(DummyInstance.self)
+
+        // Then
+        XCTAssert(firstInstance === secondInstance)
     }
 }
