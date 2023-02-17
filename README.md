@@ -4,7 +4,7 @@
 
 Add the following to the `dependencies` array in your "Package.swift" file:
 
-     .package(url: "https://github.com/pedroullmann/ServiceLocator.git", from: Version("1.0.0"))
+     .package(url: "https://github.com/pedroullmann/ServiceLocator.git", from: Version("1.0.1"))
 
 ## Usage
 
